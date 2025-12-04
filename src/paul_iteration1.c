@@ -130,7 +130,7 @@ void app_main() {
   wifi_connect(WIFI_SSID, WIFI_PASS);
   
   esp_mqtt_client_config_t mqtt_cfg = {
-      .broker.address.uri = BROKER_URI,
+    .broker.address.uri = BROKER_URI,
   };
   esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
   esp_mqtt_client_start(client);
