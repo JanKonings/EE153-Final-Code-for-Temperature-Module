@@ -22,7 +22,6 @@ errors
 #include "esp_adc/adc_oneshot.h"
 #include "soc/gpio_reg.h"
 #include "driver/gpio.h" // GPIO pin controls
-#include "driver/spi_master.h"
 
 #include "nvs_flash.h"
 #include "esp_netif.h"
@@ -137,5 +136,5 @@ void app_main() {
   esp_mqtt_client_start(client);
   esp_mqtt_client_publish(client, "phicke03/iteration1/ic_temp", msg_ic, 0, 0, 0);
   vTaskDelay(500/portTICK_PERIOD_MS);
-  esp_deep_sleep(1000*1000 * 59 * 60); //sleep for 59 minutes
+  esp_deep_sleep(1000*1000 * 15 * 60); //sleep for 59 minutes
 }
