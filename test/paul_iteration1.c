@@ -13,6 +13,7 @@ errors
 
 
 #include <stdio.h>
+#include "math.h"
 
 #include "driver/i2c.h"
 
