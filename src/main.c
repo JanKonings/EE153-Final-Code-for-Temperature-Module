@@ -47,6 +47,6 @@ void app_main(void)
 
 
     //publish
-    esp_mqtt_client_publish(client, "jkonin01/iteration1/thermistor_temp", , 0, 0, 0);
+    esp_mqtt_client_publish(client, "jkonin01/iteration1/thermistor_temp", "working" , 0, 0, 0);
 
 }
