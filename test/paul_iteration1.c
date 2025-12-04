@@ -11,6 +11,11 @@ errors
 
 */
 
+
+#include <stdio.h>
+
+#include "driver/i2c.h"
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h" // Used for timer delay
 #include "esp_adc/adc_oneshot.h"
@@ -21,8 +26,7 @@ errors
 #include "nvs_flash.h"
 #include "esp_netif.h"
 #include "mqtt_client.h"
-#include "wifi.h"
-#include "spi.h"
+#include "minimal_wifi.h"
 #include "esp_log.h"
 #include "esp_sleep.h"
 
@@ -39,7 +43,6 @@ errors
 #define TAG "THERM+MQTT"
 
 // ADC (Thermistor) 
-#define THERM_CH   ADC1_CHANNEL_0
 #define LED_PIN    GPIO_NUM_4
 
 // I²C (TMP1075) 
@@ -51,12 +54,6 @@ errors
 #define TMP1075_TEMP_REG    0x00
 #define TMP1075_RESOLUTION  0.0625f  
 
-// Raw ADC readings
-static int read_avg_raw(adc1_channel_t ch) {
-  int sum = 0;
-  for (int i = 0; i < AVG_N; i++) sum += adc1_get_raw(ch);
-  return (sum + AVG_N/2) / AVG_N;
-}
 
 // Initialize I2C
 static void i2c_master_init(void) {
@@ -86,8 +83,8 @@ static float tmp1075_read_temp(void) {
   );
 
   if (err != ESP_OK) {
-      ESP_LOGE(TAG, "TMP1075 read failed: %s", esp_err_to_name(err));
-      return NAN;
+    ESP_LOGE(TAG, "TMP1075 read failed: %s", esp_err_to_name(err));
+    return NAN;
   }
 
   int16_t raw = ((int16_t)buf[0] << 8) | buf[1];
@@ -97,11 +94,6 @@ static float tmp1075_read_temp(void) {
 }
 
 void app_main() {
-
-  // ADC
-  adc1_config_width(ADC_WIDTH_BIT_12);
-  adc1_config_channel_atten(THERM_CH, ADC_ATTEN_DB_11);
-
   // I2C
   i2c_master_init();
 
