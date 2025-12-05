@@ -48,8 +48,8 @@ errors
 // I²C (TMP1075) 
 #define I2C_MASTER_PORT     I2C_NUM_0
 #define I2C_MASTER_FREQ_HZ  100000
-#define SDA_PIN             16
-#define SCL_PIN             15
+#define SDA_PIN             2
+#define SCL_PIN             3
 #define TMP1075_ADDR        0x48      
 #define TMP1075_TEMP_REG    0x00
 #define TMP1075_RESOLUTION  0.0625f  
@@ -121,12 +121,12 @@ void app_main() {
   i2c_master_init();
 
   //MQTT
-  // esp_err_t ret = nvs_flash_init();
-  // if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-  //   ESP_ERROR_CHECK(nvs_flash_erase());
-  //   ret = nvs_flash_init();
-  // }
-  // ESP_ERROR_CHECK(ret);
+  esp_err_t ret = nvs_flash_init();
+  if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+    ESP_ERROR_CHECK(nvs_flash_erase());
+    ret = nvs_flash_init();
+  }
+  ESP_ERROR_CHECK(ret);
 
  
   
@@ -135,38 +135,39 @@ void app_main() {
   
   // READ TEMP 
   // TMP1075
-  // float t_ic = tmp1075_read_temp();
-  // char msg_ic[32];
+  float t_ic = tmp1075_read_temp();
+  char msg_ic[32];
+  snprintf(msg_ic, sizeof(msg_ic), "%.2f", t_ic);
 
-  // if (!isnan(t_ic)) {
-  //   ESP_LOGI(TAG, "TMP1075: %.2f °C", t_ic);
-  // } else {
-  //   ESP_LOGW(TAG, "TMP1075 reading is NaN");
-  // }
+
+  if (!isnan(t_ic)) {
+    ESP_LOGI(TAG, "TMP1075: %.2f °C", t_ic);
+  } else {
+    ESP_LOGW(TAG, "TMP1075 reading is NaN");
+  }
 
   // serial test
   // char ic_buffer[7];
   
-  ESP_LOGI("MAIN", "Hello from ESP_LOGI!");
+  ESP_LOGI("MAIN", "Hello!");
 
   vTaskDelay(100/portTICK_PERIOD_MS);
 
-  while (1) {
-    vTaskDelay(pdMS_TO_TICKS(1000));
-  }
-  
-
+  // while (1) {
+  //   vTaskDelay(pdMS_TO_TICKS(1000));
+  // }
 
 
   // wifi/mqtt
-  // wifi_connect(WIFI_SSID, WIFI_PASS);
+  wifi_connect(WIFI_SSID, WIFI_PASS);
   
-  // esp_mqtt_client_config_t mqtt_cfg = {
-  //   .broker.address.uri = BROKER_URI,
-  // };
-  // esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
-  // esp_mqtt_client_start(client);
-  // esp_mqtt_client_publish(client, "jkonin01/iteration1/ic_temp", msg_ic, 0, 0, 0);
-  // vTaskDelay(500/portTICK_PERIOD_MS);
+  esp_mqtt_client_config_t mqtt_cfg = {
+    .broker.address.uri = BROKER_URI,
+  };
+  esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
+  esp_mqtt_client_start(client);
+  esp_mqtt_client_publish(client, "jkonin01/iteration1/ic_temp", msg_ic, 0, 0, 0);
+  vTaskDelay(500/portTICK_PERIOD_MS);
   // esp_deep_sleep(1000*1000 * 59 * 60); //sleep for 59 minutes
+  esp_deep_sleep(1000*1000 * 1 * 3); //sleep for 59 minutes
 }
