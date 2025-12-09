@@ -53,7 +53,7 @@ void app_main() {
     }
     ESP_ERROR_CHECK(ret);
 
-    Measurement msmnts[1] = {{1,1}};
+    measurement msmnts[1] = {{1,1}};
     sendMessage(msmnts, 1);
   
   vTaskDelay(500/portTICK_PERIOD_MS);

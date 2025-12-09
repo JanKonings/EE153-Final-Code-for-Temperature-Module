@@ -1,17 +1,3 @@
-/*
-Modules
-
-storage
-
-temp sensor
-
-mqtt get this working
-
-errors
-
-*/
-
-
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h" // Used for timer delay
@@ -26,9 +12,9 @@ errors
 
 #include "tempSensor.h"
 
-// #include "transmit.h"
-
 #include "storage.h"
+
+#include "RTC.h"
 
 
 #define POWER_GPIO GPIO_NUM_0
@@ -50,12 +36,15 @@ void app_main() {
   //flash init setup
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-        ESP_ERROR_CHECK(nvs_flash_erase());//maybe be careful this doesn't whipe memory
-        ret = nvs_flash_init();
+      ESP_ERROR_CHECK(nvs_flash_erase());//maybe be careful this doesn't whipe memory
+      ret = nvs_flash_init();
     }
+    
     ESP_ERROR_CHECK(ret);
 
-    int time = 10000;
+
+    // right now theres no check if the rtc is calibrated yet, so we need to look at that (maybe do an initial wifif connect)
+    int time = getTime();
     addNewMeasurment(time, t_ic);
 
     // ESP_ERROR_CHECK(nvs_flash_erase());
@@ -63,7 +52,6 @@ void app_main() {
 
 
     // measurement msmnts[1] = {{1,1}};
-
     // sendMessage(msmnts, 1);
   
   vTaskDelay(500/portTICK_PERIOD_MS);

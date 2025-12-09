@@ -7,7 +7,6 @@
 
 #include "transmit.h"
 
-
 #include "freertos/FreeRTOS.h"
 
 #define BATCH_NUMBER 48

@@ -11,7 +11,6 @@ void saveArrayData(void)
     err = nvs_open(STORAGE_NAMESPACE, NVS_READWRITE, &DATA);
     if (err != ESP_OK) {
         ESP_LOGE(TAG2, "Error (%s) opening NVS handle!", esp_err_to_name(err));
-        // return err;
         return;
     }
 
@@ -20,7 +19,6 @@ void saveArrayData(void)
     if (err != ESP_OK) {
         ESP_LOGE(TAG2, "Failed to write temperature/time dats array");
         nvs_close(DATA);
-        // return err;
         return;
     }
 
@@ -31,7 +29,6 @@ void saveArrayData(void)
     }
 
     nvs_close(DATA);
-    // return err;
 }
 
 void readArrayData(void)
@@ -40,7 +37,6 @@ void readArrayData(void)
     esp_err_t err;
 
     err = nvs_open(STORAGE_NAMESPACE, NVS_READONLY, &DATA);
-    // if (err != ESP_OK) return err;
 
     ESP_LOGI(TAG2, "Reading temperature/time pair array");
     size_t data_size = sizeof(readings);
@@ -54,21 +50,10 @@ void addNewMeasurment(int time, float temp) {
     esp_err_t err;
 
     err = nvs_open(STORAGE_NAMESPACE, NVS_READWRITE, &DATA);
-    // if (err != ESP_OK) return err;
 
     ESP_LOGI(TAG2, "Reading iteration number");
     int32_t iterationNum = 0;
     err = nvs_get_i32(DATA, "iterationNum", &iterationNum);
-    // switch (err) {
-    //     case ESP_OK:
-    //         ESP_LOGI(TAG, "Read counter = %" PRIu32, iterationNum);
-    //         break;
-    //     case ESP_ERR_NVS_NOT_FOUND:
-    //         ESP_LOGW(TAG, "The value is not initialized yet!");
-    //         break;
-    //     default:
-    //         ESP_LOGE(TAG, "Error (%s) reading!", esp_err_to_name(err));
-    // }
 
     measurement newMeasurement;
     newMeasurement.temp = temp;
@@ -77,9 +62,8 @@ void addNewMeasurment(int time, float temp) {
     if (err == ESP_ERR_NVS_NOT_FOUND) {
         ESP_LOGI("debug", "INSIDE NVS NOT FOUND FOR ITERATOR");
         iterationNum = 0;
-        // readArrayData();
         readings[iterationNum] = newMeasurement;
-        saveArrayData();
+        saveArrayData(); // no read because the array should be empty
         iterationNum++;
 
     } else if (iterationNum >= 23) {
