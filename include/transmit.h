@@ -1,7 +1,7 @@
 typedef struct {
     int time; // Unix Time
     float temp; // Temperature in Celsius
-} Measurement;
+} measurement;
 
 typedef enum {
     GOOD = 0,
@@ -9,4 +9,4 @@ typedef enum {
     BAD = 2
 } Status;
 
-void sendMessage(Measurement [], int);
+void sendMessage(measurement [], int);
