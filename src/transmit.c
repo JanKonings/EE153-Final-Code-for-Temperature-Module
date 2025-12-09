@@ -5,10 +5,17 @@
 #include "mqtt_client.h"
 #include "minimal_wifi.h"
 
+#include "RTC.h"
+
 #include <esp_log.h>
 
-#define WIFI_SSID      "Tufts_Wireless"
-#define WIFI_PASS      ""
+#define WIFI_SSID      "Verizon_G4PLJC"
+#define WIFI_PASS      "cue9-pray-awe"
+
+// #define WIFI_SSID      "Tufts_Wireless"
+// #define WIFI_PASS      ""
+
+
 #define BROKER_URI "mqtt://bell-mqtt.eecs.tufts.edu"
 #define MQTT_TOPIC "phicke03/discard"
 
@@ -27,7 +34,9 @@ void sendMessage(measurement arr[], int length) {
 
     ESP_LOGI("PAYLOAD", "%s", payload);
     // COnnect to wifi
-    // wifi_connect(WIFI_SSID, WIFI_PASS);
+    wifi_connect(WIFI_SSID, WIFI_PASS);
+
+    syncTime();
 
     // esp_mqtt_client_config_t mqtt_cfg = {
     //     .broker.address.uri = BROKER_URI,

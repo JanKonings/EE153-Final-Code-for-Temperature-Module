@@ -34,25 +34,24 @@ void app_main() {
   snprintf(msg_ic, sizeof(msg_ic), "%.2f", t_ic);
 
   //flash init setup
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-      ESP_ERROR_CHECK(nvs_flash_erase());//maybe be careful this doesn't whipe memory
-      ret = nvs_flash_init();
-    }
-    
-    ESP_ERROR_CHECK(ret);
+  esp_err_t ret = nvs_flash_init();
+  if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+    ESP_ERROR_CHECK(nvs_flash_erase());//maybe be careful this doesn't whipe memory
+    ret = nvs_flash_init();
+  }
+  
+  ESP_ERROR_CHECK(ret);
+
+  // right now theres no check if the rtc is calibrated yet, so we need to look at that (maybe do an initial wifif connect)
+  int time = getTime();
+  addNewMeasurment(time, t_ic);
+
+  // ESP_ERROR_CHECK(nvs_flash_erase());
+  // ESP_LOGI("EARSE", "earsed flash");
 
 
-    // right now theres no check if the rtc is calibrated yet, so we need to look at that (maybe do an initial wifif connect)
-    int time = getTime();
-    addNewMeasurment(time, t_ic);
-
-    // ESP_ERROR_CHECK(nvs_flash_erase());
-    // ESP_LOGI("EARSE", "earsed flash");
-
-
-    // measurement msmnts[1] = {{1,1}};
-    // sendMessage(msmnts, 1);
+  // measurement msmnts[1] = {{1,1}};
+  // sendMessage(msmnts, 1);
   
   vTaskDelay(500/portTICK_PERIOD_MS);
   esp_deep_sleep(1000*1000 * 1 * 1); //sleep for 10 seconds

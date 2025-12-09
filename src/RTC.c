@@ -4,9 +4,9 @@ void syncTime() {
     esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG("pool.ntp.org");
     esp_netif_sntp_init(&config);
 
-    if (esp_netif_sntp_sync_wait(pdMS_TO_TICKS(1000)) != ESP_OK) {
-        ESP_LOGE("NTP", "Failed to sync time within 1 second");
-    }
+    // if (esp_netif_sntp_sync_wait(pdMS_TO_TICKS(1000)) != ESP_OK) {
+    //     ESP_LOGE("NTP", "Failed to sync time within 1 second");
+    // }
 }
 
 int getTime() {
