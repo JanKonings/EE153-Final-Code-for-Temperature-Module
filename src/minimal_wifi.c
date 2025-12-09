@@ -64,7 +64,9 @@
  /* Initialize the WiFi STA connection.
   * This function configures the connection and then blocks until the connection either
   * succeeds or fails. */
- void wifi_connect(const char* ssid, const char* pass)
+
+// updated to return esp_err so it cna be checked
+ esp_err_t wifi_connect(const char* ssid, const char* pass)
  {
      s_wifi_event_group = xEventGroupCreate();
  
@@ -123,9 +125,17 @@
       * happened. */
      if (bits & WIFI_CONNECTED_BIT) {
          ESP_LOGI(TAG, "connected to AP SSID: %s", ssid);
+         //added line for error return
+         return ESP_OK;
      } else if (bits & WIFI_FAIL_BIT) {
          ESP_LOGI(TAG, "Failed to connect to SSID: %s", ssid);
+        
+         //added line for error return
+         return WIFI_FAIL_BIT;
      } else {
          ESP_LOGE(TAG, "UNEXPECTED EVENT");
+        
+         // just breturn random thing that isnt esp_ok
+        return ESP_AUTO_IP;
      }
  }

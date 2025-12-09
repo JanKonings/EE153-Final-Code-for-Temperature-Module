@@ -1,27 +1,9 @@
 #include "transmit.h"
-#include <string.h>
-
-#include "esp_netif.h"
-#include "mqtt_client.h"
-#include "minimal_wifi.h"
-
 #include "RTC.h"
-
-#include <esp_log.h>
-
-#define WIFI_SSID      "Verizon_G4PLJC"
-#define WIFI_PASS      "cue9-pray-awe"
-
-// #define WIFI_SSID      "Tufts_Wireless"
-// #define WIFI_PASS      ""
-
-
-#define BROKER_URI "mqtt://bell-mqtt.eecs.tufts.edu"
-#define MQTT_TOPIC "phicke03/discard"
 
 
 // for later: Status health, int missed, int rssi, char log[], int logLength
-void sendMessage(measurement arr[], int length) {
+esp_err_t sendMessage(measurement arr[], int length) {
     char payload[1024] = "{\"measurements\":[";
     for(int i = 0; i < length; i++) {
         char pair[32];
@@ -33,10 +15,22 @@ void sendMessage(measurement arr[], int length) {
     strcat(payload, "]}");
 
     ESP_LOGI("PAYLOAD", "%s", payload);
-    // COnnect to wifi
-    wifi_connect(WIFI_SSID, WIFI_PASS);
 
-    syncTime();
+    // try to COnnect to wifi
+    esp_err_t err1 = wifi_connect(WIFI_SSID, WIFI_PASS);
+
+    if (err1 != ESP_OK) {
+        ESP_LOGE("WIFI", "failed to connect to wifi");
+        return err1;
+    }
+
+    // sync time and check if worked
+    esp_err_t err = syncTime();
+
+    if (err != ESP_OK) {
+       ESP_LOGE("NTP", "RTC calbration failed in transmit");
+    }
+    
 
     // esp_mqtt_client_config_t mqtt_cfg = {
     //     .broker.address.uri = BROKER_URI,
@@ -48,4 +42,6 @@ void sendMessage(measurement arr[], int length) {
 
     // // send data to mqtt
     // esp_mqtt_client_publish(client, MQTT_TOPIC, payload, 0, 0, 0);
+
+    return ESP_OK;
 }

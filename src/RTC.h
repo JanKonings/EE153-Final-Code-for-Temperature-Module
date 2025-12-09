@@ -11,5 +11,5 @@
 #include "lwip/ip_addr.h"
 #include "esp_sntp.h"
 
-void syncTime();
+esp_err_t syncTime();
 int getTime();

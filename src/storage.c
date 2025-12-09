@@ -72,15 +72,18 @@ void addNewMeasurment(int time, float temp) {
         readings[iterationNum] = newMeasurement;
         saveArrayData();
 
-        sendMessage(readings, iterationNum + 1);
+        esp_err_t err1 = sendMessage(readings, iterationNum + 1);
 
-        //TODO: add way to detect wether wifif connect/dat sent or not
-        readArrayData();
-        memset(readings, 0, sizeof(readings));
-        saveArrayData();
-
-        iterationNum = 0;
-
+        // if wifi connected and sent data erase all emasurments adn restart iterationNum
+        if (err1 == ESP_OK) {
+            memset(readings, 0, sizeof(readings));
+            saveArrayData();
+            iterationNum = -1;
+        }
+    
+        iterationNum++;
+        // this is just for debugging so that i can see the batc send for longer before it goes throuhg iteratiosn again
+        // will remove for actual final code
         vTaskDelay(10000/portTICK_PERIOD_MS);
     } else {
         ESP_LOGI("debug", "INSIDE ELSE");

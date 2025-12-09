@@ -19,6 +19,32 @@
 
 #define POWER_GPIO GPIO_NUM_0
 
+// function to check if the RTC has been set yet, so that even the firt measruments have an accurate time.
+void RTCcheck() {
+  time_t now;
+  time(&now);
+
+  if (now < 1700000000) {  
+    // RTC is uninitialized
+    ESP_LOGW("TIME", "RTC not calibrated, syncing now");
+
+    esp_err_t wifi_err = wifi_connect(WIFI_SSID, WIFI_PASS);
+
+    if (syncTime() == ESP_OK) {
+      ESP_LOGI("TIME", "RTC synced successfully");
+    } else {
+      ESP_LOGE("TIME", "NTP sync failed!");
+    }
+
+    // if (wifi_err == ESP_OK) {
+    //   esp_wifi_stop();  // save power by turnign the wifif back off
+    // }
+
+  } else {
+    ESP_LOGI("TIME", "RTC already valid");
+  }
+}
+
 void app_main() {
   //enable temp sensor throuhg power gpio
   gpio_reset_pin(POWER_GPIO);
@@ -42,7 +68,7 @@ void app_main() {
   
   ESP_ERROR_CHECK(ret);
 
-  // right now theres no check if the rtc is calibrated yet, so we need to look at that (maybe do an initial wifif connect)
+  RTCcheck();
   int time = getTime();
   addNewMeasurment(time, t_ic);
 
