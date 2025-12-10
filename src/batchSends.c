@@ -80,5 +80,5 @@ void app_main() {
   // sendMessage(msmnts, 1);
   
   vTaskDelay(500/portTICK_PERIOD_MS);
-  esp_deep_sleep(1000*1000 * 1 * 1); //sleep for 10 seconds
+  esp_deep_sleep(1000*1000 * 15 * 60); //sleep for 15 seconds
 }

@@ -17,7 +17,7 @@
 
 
 #define BROKER_URI "mqtt://bell-mqtt.eecs.tufts.edu"
-#define MQTT_TOPIC "phicke03/discard"
+#define MQTT_TOPIC "teamN/node0/update"
 
 typedef struct {
     int time; // Unix Time

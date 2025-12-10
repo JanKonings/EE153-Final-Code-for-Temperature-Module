@@ -66,7 +66,7 @@ void addNewMeasurment(int time, float temp) {
         saveArrayData(); // no read because the array should be empty
         iterationNum++;
 
-    } else if (iterationNum >= 23) {
+    } else if (iterationNum >= 3) {
         ESP_LOGI("debug", "INSIDE BATCH SEND");
         readArrayData();
         readings[iterationNum] = newMeasurement;

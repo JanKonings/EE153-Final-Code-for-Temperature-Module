@@ -25,12 +25,12 @@ int getTime() {
     time(&now);
 
     // this is for tetsing the code, it prints huma. readble time
-    struct tm timeinfo;
-    localtime_r(&now, &timeinfo);
+    // struct tm timeinfo;
+    // localtime_r(&now, &timeinfo);
 
-    char buf[64];
-    strftime(buf, sizeof(buf), "%c", &timeinfo);
-    ESP_LOGI("TIME", "Current time: %s", buf);
+    // char buf[64];
+    // strftime(buf, sizeof(buf), "%c", &timeinfo);
+    // ESP_LOGI("TIME", "Current time: %s", buf);
 
     return (int)now;
 }
