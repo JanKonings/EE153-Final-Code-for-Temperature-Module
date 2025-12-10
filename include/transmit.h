@@ -31,3 +31,5 @@ typedef enum {
 } Status;
 
 esp_err_t sendMessage(measurement [], int);
+int32_t wifiStatus(esp_err_t err);
+

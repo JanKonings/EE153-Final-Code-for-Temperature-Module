@@ -18,11 +18,18 @@ esp_err_t sendMessage(measurement arr[], int length) {
     snprintf(time_str, sizeof(time_str), "], \"board_time\": %d, ", timeNow);
     strcat(payload, time_str);
 
-    char heartbeat[] = "\"heartbeat\": {\"status\": 0, \"rssi\": ";
+    char heartbeat[] = "\"heartbeat\": {\"status\": 0, ";
     strcat(payload, heartbeat);
 
     // try to COnnect to wifi
     esp_err_t err1 = wifi_connect(WIFI_SSID, WIFI_PASS);
+
+    int32_t wifiFails = wifiStatus(err1);
+
+    char fail_str[32];
+    snprintf(fail_str, sizeof(fail_str), "\"connections_missed\": %d, ", wifiFails);
+    strcat(payload, fail_str);
+
 
     if (err1 != ESP_OK) {
         ESP_LOGE("WIFI", "failed to connect to wifi");
@@ -40,9 +47,9 @@ esp_err_t sendMessage(measurement arr[], int length) {
     }
 
     char RSSI_str[16];
-    snprintf(RSSI_str, sizeof(RSSI_str), "%d", RSSI);
-
+    snprintf(RSSI_str, sizeof(RSSI_str), "\"rssi\": %d", RSSI);
     strcat(payload, RSSI_str);
+
     strcat(payload, "}}");
 
     ESP_LOGI("PAYLOAD", "%s", payload);
@@ -74,4 +81,26 @@ esp_err_t sendMessage(measurement arr[], int length) {
 
 
     return ESP_OK;
+}
+
+int32_t wifiStatus(esp_err_t err) {
+    nvs_handle_t DATA;
+    esp_err_t err1;
+
+    int32_t wifiFails = 0;
+
+    err = nvs_open("storage", NVS_READWRITE, &DATA);
+    if (err == ESP_OK) {
+        err1 = nvs_set_i32(DATA, "wifiFails", 0);
+    } else {
+        err1 = nvs_get_i32(DATA, "wifiFails", &wifiFails);
+        wifiFails += 1;
+        err1 = nvs_set_i32(DATA, "wifiFails", wifiFails);
+    }
+
+    err1 = nvs_commit(DATA);
+
+    nvs_close(DATA);
+
+    return wifiFails;
 }
