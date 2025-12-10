@@ -19,6 +19,9 @@
 
 #define POWER_GPIO GPIO_NUM_0
 
+const uint64_t MIN_US = 1000U * 1000U * 60U;
+const uint64_t HOUR_US = MIN_US * 60U;
+
 // function to check if the RTC has been set yet, so that even the firt measruments have an accurate time.
 void RTCcheck() {
   time_t now;
@@ -45,11 +48,32 @@ void RTCcheck() {
   }
 }
 
+void sleep_error_check(){
+  esp_sleep_wakeup_cause_t sleep_cause = esp_sleep_get_wakeup_cause();
+  switch (sleep_cause){
+    case ESP_SLEEP_WAKEUP_TIMER:
+      break;
+    case ESP_SLEEP_WAKEUP_UNDEFINED:
+      ESP_LOGE("SLEEP", "Reset not from sleep");
+      break;
+    case ESP_SLEEP_WAKEUP_VBAT_UNDER_VOLT:
+      ESP_LOGE("SLEEP", "VERY BAD: reset because of low power.");
+      break;
+    case ESP_SLEEP_WAKEUP_COCPU_TRAP_TRIG:
+      ESP_LOGE("SLEEP", "Coprocessor Crash");
+      break;
+    default:
+      ESP_LOGE("SLEEP", "Wakeup cause weird");
+  }
+}
+
 void app_main() {
   //enable temp sensor throuhg power gpio
   gpio_reset_pin(POWER_GPIO);
   gpio_set_direction(POWER_GPIO, GPIO_MODE_OUTPUT);
   gpio_set_level(POWER_GPIO, 1);
+  
+  sleep_error_check();
 
   // initiate the i2c communication for Temp sensor
   i2c_master_init();
@@ -80,5 +104,5 @@ void app_main() {
   // sendMessage(msmnts, 1);
   
   vTaskDelay(500/portTICK_PERIOD_MS);
-  esp_deep_sleep(1000*1000 * 1 * 1); //sleep for 10 seconds
+  esp_deep_sleep(HOUR_US);
 }

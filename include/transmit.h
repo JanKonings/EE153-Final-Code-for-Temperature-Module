@@ -1,3 +1,5 @@
+#ifndef TRANSMIT
+#define TRANSMIT
 #include <string.h>
 
 #include "esp_netif.h"
@@ -31,3 +33,5 @@ typedef enum {
 } Status;
 
 esp_err_t sendMessage(measurement [], int);
+
+#endif

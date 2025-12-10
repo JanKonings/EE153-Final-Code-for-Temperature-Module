@@ -1,5 +1,7 @@
-#include <inttypes.h>
+#ifndef MY_STORAGE
+#define MY_STORAGE
 
+#include <inttypes.h>
 #include "esp_system.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
@@ -19,3 +21,4 @@ void saveArrayData(void);
 void readArrayData(void);
 void addNewMeasurment(int time, float temp);
 
+#endif
