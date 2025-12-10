@@ -25,11 +25,11 @@ esp_err_t sendMessage(measurement arr[], int length) {
     }
 
     // sync time and check if worked
-    esp_err_t err = syncTime();
+    // esp_err_t err = syncTime();
 
-    if (err != ESP_OK) {
-       ESP_LOGE("NTP", "RTC calbration failed in transmit");
-    }
+    // if (err != ESP_OK) {
+    //    ESP_LOGE("NTP", "RTC calbration failed in transmit");
+    // }
     
 
     // esp_mqtt_client_config_t mqtt_cfg = {
