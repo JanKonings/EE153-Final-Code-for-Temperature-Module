@@ -19,7 +19,7 @@
 
 
 #define BROKER_URI "mqtt://bell-mqtt.eecs.tufts.edu"
-#define MQTT_TOPIC "phicke03/discard"
+#define MQTT_TOPIC "teamN/node0/update"
 
 typedef struct {
     int time; // Unix Time
@@ -33,5 +33,6 @@ typedef enum {
 } Status;
 
 esp_err_t sendMessage(measurement [], int);
+int32_t wifiStatus(esp_err_t err);
 
 #endif
