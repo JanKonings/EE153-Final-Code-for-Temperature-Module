@@ -27,7 +27,7 @@ esp_err_t sendMessage(measurement arr[], int length) {
     int32_t wifiFails = wifiStatus(err1);
 
     char fail_str[32];
-    snprintf(fail_str, sizeof(fail_str), "\"connections_missed\": %d, ", wifiFails);
+    snprintf(fail_str, sizeof(fail_str), "\"connections_missed\": %ld, ", wifiFails);
     strcat(payload, fail_str);
 
 
