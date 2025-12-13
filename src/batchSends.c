@@ -48,24 +48,24 @@ void RTCcheck() {
   }
 }
 
-void sleep_error_check(){
-  esp_sleep_wakeup_cause_t sleep_cause = esp_sleep_get_wakeup_cause();
-  switch (sleep_cause){
-    case ESP_SLEEP_WAKEUP_TIMER:
-      break;
-    case ESP_SLEEP_WAKEUP_UNDEFINED:
-      ESP_LOGE("SLEEP", "Reset not from sleep");
-      break;
-    case ESP_SLEEP_WAKEUP_VBAT_UNDER_VOLT:
-      ESP_LOGE("SLEEP", "VERY BAD: reset because of low power.");
-      break;
-    case ESP_SLEEP_WAKEUP_COCPU_TRAP_TRIG:
-      ESP_LOGE("SLEEP", "Coprocessor Crash");
-      break;
-    default:
-      ESP_LOGE("SLEEP", "Wakeup cause weird");
-  }
-}
+// void sleep_error_check(){
+//   esp_sleep_wakeup_cause_t sleep_cause = esp_sleep_get_wakeup_cause();
+//   switch (sleep_cause){
+//     case ESP_SLEEP_WAKEUP_TIMER:
+//       break;
+//     case ESP_SLEEP_WAKEUP_UNDEFINED:
+//       ESP_LOGE("SLEEP", "Reset not from sleep");
+//       break;
+//     case ESP_SLEEP_WAKEUP_VBAT_UNDER_VOLT:
+//       ESP_LOGE("SLEEP", "VERY BAD: reset because of low power.");
+//       break;
+//     case ESP_SLEEP_WAKEUP_COCPU_TRAP_TRIG:
+//       ESP_LOGE("SLEEP", "Coprocessor Crash");
+//       break;
+//     default:
+//       ESP_LOGE("SLEEP", "Wakeup cause weird");
+//   }
+// }
 
 void app_main() {
   //enable temp sensor throuhg power gpio
@@ -73,7 +73,7 @@ void app_main() {
   gpio_set_direction(POWER_GPIO, GPIO_MODE_OUTPUT);
   gpio_set_level(POWER_GPIO, 1);
   
-  sleep_error_check();
+  // sleep_error_check();
 
   // initiate the i2c communication for Temp sensor
   i2c_master_init();
@@ -96,13 +96,19 @@ void app_main() {
   int time = getTime();
   addNewMeasurment(time, t_ic);
 
-  // ESP_ERROR_CHECK(nvs_flash_erase());
-  // ESP_LOGI("EARSE", "earsed flash");
+  // nvs_handle_t h;
+  // if (nvs_open(STORAGE_NAMESPACE, NVS_READWRITE, &h) == ESP_OK) {
+  //   nvs_erase_all(h);   
+  //   nvs_commit(h);
+  //   nvs_close(h);
+  // }
 
 
   // measurement msmnts[1] = {{1,1}};
   // sendMessage(msmnts, 1);
   
   vTaskDelay(500/portTICK_PERIOD_MS);
-  esp_deep_sleep(HOUR_US);
+  // esp_deep_sleep(HOUR_US);
+  esp_deep_sleep(30 * MIN_US); 
+  // esp_deep_sleep(5 * 1000000ULL); 
 }

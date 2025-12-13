@@ -4,5 +4,7 @@
 
 //changed to return esp_err for check
 esp_err_t wifi_connect(const char* ssid, const char* pass);
+bool wifi_is_connected(void);
+
 
 #endif

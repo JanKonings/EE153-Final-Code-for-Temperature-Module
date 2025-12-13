@@ -36,6 +36,14 @@
  static const char *TAG = "wifi station";
  
  static int s_retry_num = 0;
+
+
+// bool function to check if wifi is connecte already
+bool wifi_is_connected(void){
+    wifi_ap_record_t ap_info;
+    esp_err_t err = esp_wifi_sta_get_ap_info(&ap_info);
+    return (err == ESP_OK);
+}
  
  /* Callback for handling all WiFi events.  This could be broken out into
   * separate functions for each of the events, but it doesn't really matter. */

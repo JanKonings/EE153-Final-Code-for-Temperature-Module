@@ -37,10 +37,22 @@ void readArrayData(void)
     esp_err_t err;
 
     err = nvs_open(STORAGE_NAMESPACE, NVS_READONLY, &DATA);
+    if (err != ESP_OK) {
+        ESP_LOGW(TAG2, "readArrayData: nvs_open failed");
+        memset(readings, 0, sizeof(readings));   
+        return;
+    }
 
     ESP_LOGI(TAG2, "Reading temperature/time pair array");
     size_t data_size = sizeof(readings);
     err = nvs_get_blob(DATA, "measurements", &readings, &data_size);
+    if (err == ESP_ERR_NVS_NOT_FOUND) {
+        ESP_LOGW(TAG2, "readArrayData: no previous measurements, clearing array");
+        memset(readings, 0, sizeof(readings));
+    } else if (err != ESP_OK) {
+        ESP_LOGE(TAG2, "readArrayData: nvs_get_blob failed");
+        memset(readings, 0, sizeof(readings));
+    }
 
     nvs_close(DATA);
 }
@@ -49,22 +61,40 @@ void addNewMeasurment(int time, float temp) {
     nvs_handle_t DATA;
     esp_err_t err;
 
+    bool first_run = false;
+
+
     err = nvs_open(STORAGE_NAMESPACE, NVS_READWRITE, &DATA);
 
     ESP_LOGI(TAG2, "Reading iteration number");
     int32_t iterationNum = 0;
     err = nvs_get_i32(DATA, "iterationNum", &iterationNum);
 
+    if (err == ESP_ERR_NVS_NOT_FOUND) {
+        ESP_LOGI("debug", "INSIDE NVS NOT FOUND FOR ITERATOR");
+        first_run = true;         
+        iterationNum = 0;
+    } else if (err != ESP_OK) {
+        ESP_LOGW(TAG2, "nvs_get_i32(iterationNum) failed, resetting to 0");
+        iterationNum = 0;
+    }
+
+    // safety so we dont go out of bounds
+    if (iterationNum < 0) {
+        iterationNum = 0;
+    } else if (iterationNum >= BATCH_NUMBER) {
+        ESP_LOGW(TAG2, "iterationNum (%d) >= BATCH_NUMBER (%d), resetting to BATCH_NUMBER - 1", iterationNum, BATCH_NUMBER);
+        iterationNum = BATCH_NUMBER - 1;
+    }
+
     measurement newMeasurement;
     newMeasurement.temp = temp;
     newMeasurement.time = time;
 
-    if (err == ESP_ERR_NVS_NOT_FOUND) {
-        ESP_LOGI("debug", "INSIDE NVS NOT FOUND FOR ITERATOR");
-        iterationNum = 0;
+    if (first_run) {
         readings[iterationNum] = newMeasurement;
         saveArrayData(); // no read because the array should be empty
-        iterationNum++;
+        iterationNum = 1;
 
     } else if (iterationNum >= 3) {
         ESP_LOGI("debug", "INSIDE BATCH SEND");
@@ -84,7 +114,7 @@ void addNewMeasurment(int time, float temp) {
         iterationNum++;
         // this is just for debugging so that i can see the batc send for longer before it goes throuhg iteratiosn again
         // will remove for actual final code
-        vTaskDelay(10000/portTICK_PERIOD_MS);
+        // vTaskDelay(10000/portTICK_PERIOD_MS);
     } else {
         ESP_LOGI("debug", "INSIDE ELSE");
 
