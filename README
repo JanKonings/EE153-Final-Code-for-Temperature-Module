@@ -1,0 +1,49 @@
+EE153 Temperature Module Firmware (ESP32-C3)
+
+This repository contains the firmware for a low-power, battery-powered temperature sensing node designed for long-term outdoor deployment. The system periodically wakes from deep sleep, measures ambient temperature, timestamps the measurement, stores it in non-volatile memory, and periodically publishes batches of data to an MQTT broker on the Tufts campus network.
+
+Features
+
+Ultra-low-power operation using deep sleep between measurements
+
+Hourly temperature sampling (configurable)
+
+Accurate timestamping using the ESP32 RTC with NTP synchronization on first boot
+
+Persistent storage (NVS) to retain data across resets, sleep cycles, and network outages
+
+Batch-based MQTT reporting to reduce WiFi power usage
+
+Health metadata reporting, including RSSI and missed connection count
+
+TMP1075 temperature sensor accessed over I²C
+
+System Overview
+
+On each wake cycle, the ESP32 powers the temperature sensor, takes a measurement, verifies that the RTC time is valid, and stores the timestamped data in flash memory. Measurements are accumulated into a batch and transmitted over MQTT once the batch reaches a predefined size. If WiFi or MQTT transmission fails, the data remains stored and is retried later. The device then returns to deep sleep to minimize power consumption.
+
+Code Flow
+
+Wake from deep sleep
+
+Enable temperature sensor via GPIO
+
+Initialize I²C and read temperature
+
+Initialize NVS and verify RTC validity
+
+If RTC is uninitialized, connect to WiFi and sync time via NTP
+
+Store (timestamp, temperature) pair in NVS
+
+When batch size is reached:
+
+Connect to WiFi
+
+Publish batch to MQTT as a JSON payload
+
+Clear stored data on successful transmission
+
+Enter deep sleep until the next measurement interval
+
+Repository Structure
