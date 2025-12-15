@@ -2,6 +2,7 @@
  * Based on public domain example from Espressif:
  * https://github.com/espressif/esp-idf/blob/5f4249357372f209fdd57288265741aaba21a2b1/examples/wifi/getting_started/station/main/station_example_main.c
  * Steven Bell <sbell@ece.tufts.edu>
+ * Edited by Jan Konings <
  * February 2024
  */
 
@@ -38,7 +39,7 @@
  static int s_retry_num = 0;
 
 
-// bool function to check if wifi is connecte already
+// bool function to check if wifi is connecte already (JAN ADDED)
 bool wifi_is_connected(void){
     wifi_ap_record_t ap_info;
     esp_err_t err = esp_wifi_sta_get_ap_info(&ap_info);
@@ -73,7 +74,7 @@ bool wifi_is_connected(void){
   * This function configures the connection and then blocks until the connection either
   * succeeds or fails. */
 
-// updated to return esp_err so it cna be checked
+// updated to return esp_err so it cna be checked (JAN ADDED)
  esp_err_t wifi_connect(const char* ssid, const char* pass)
  {
      s_wifi_event_group = xEventGroupCreate();

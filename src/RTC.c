@@ -1,15 +1,12 @@
 #include "RTC.h"
 
 esp_err_t syncTime() {
+    // default sntp config
     esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG("pool.ntp.org");
     esp_netif_sntp_init(&config);
 
-    // if (esp_netif_sntp_sync_wait(pdMS_TO_TICKS(1000)) != ESP_OK) {
-    //     ESP_LOGE("NTP", "Failed to sync time within 1 second");
-    // }
 
-
-    // currently is waiting for five seconds we can def make shorter to save power
+    // currently is waiting for five seconds, but since this is called only once at startup should be fine for power consumptino
     esp_err_t err = esp_netif_sntp_sync_wait(pdMS_TO_TICKS(5000));
     if (err != ESP_OK) {
         ESP_LOGW("NTP", "did not sync within 5 seconds");
@@ -24,7 +21,8 @@ int getTime() {
     time_t now;
     time(&now);
 
-    // this is for tetsing the code, it prints huma. readble time
+    // this is for tetsing the code/debugging, it prints human readble time
+
     // struct tm timeinfo;
     // localtime_r(&now, &timeinfo);
 

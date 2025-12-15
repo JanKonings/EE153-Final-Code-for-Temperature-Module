@@ -2,17 +2,22 @@
 #include "RTC.h"
 #include "esp_wifi.h"
 
+// static buffer to hold payload
 static char payload[2048];
 
+// mqtt client configuration
 static const esp_mqtt_client_config_t mqtt_cfg = {
     .broker.address.uri = BROKER_URI,
 };
 
-// for later: Status health, int missed, int rssi, char log[], int logLength
+// function to send message to mqtt broker
 esp_err_t sendMessage(measurement arr[], int length) {
+    // construct payload
     payload[0] = '\0';
+    // begin with measurements array
     strlcpy(payload, "{\"measurements\":[", sizeof(payload));
 
+    // append each measurement pair
     for(int i = 0; i < length; i++) {
         char pair[64];
         snprintf(pair, sizeof(pair), "[%d,%.2f%s",
@@ -20,17 +25,20 @@ esp_err_t sendMessage(measurement arr[], int length) {
         strlcat(payload, pair, sizeof(payload));
     }
 
+    // close measurements array and add board time 
     int timeNow = getTime();
     char time_str[32];
     snprintf(time_str, sizeof(time_str), "], \"board_time\": %d, ", timeNow);
     strlcat(payload, time_str, sizeof(payload));
 
+    // add heartbeat object
     char heartbeat[] = "\"heartbeat\": {\"status\": 0, ";
     strlcat(payload, heartbeat, sizeof(payload));
 
     // try to COnnect to wifi
     esp_err_t err1;
 
+    // check if already connected (was having issues when RTC would connect and then we would try again here)
     if (wifi_is_connected()) {
         ESP_LOGI("WIFI", "araready connected, skipping wifif connect");
         err1 = ESP_OK;   
@@ -41,12 +49,12 @@ esp_err_t sendMessage(measurement arr[], int length) {
     // record/update failure count
     int32_t wifiFails = wifiStatus(err1);
 
-
+    // add connection_missed field to heartbeat
     char fail_str[32];
     snprintf(fail_str, sizeof(fail_str), "\"connections_missed\": %ld, ", wifiFails);
     strlcat(payload, fail_str, sizeof(payload));
 
-
+    // check if wifi connection was successful
     if (err1 != ESP_OK) {
         ESP_LOGE("WIFI", "failed to connect to wifi");
         return err1;
@@ -62,6 +70,7 @@ esp_err_t sendMessage(measurement arr[], int length) {
         ESP_LOGE("WIFI", "failed to egt rssi");
     }
 
+    // add rssi field to heartbeat
     char RSSI_str[16];
     snprintf(RSSI_str, sizeof(RSSI_str), "\"rssi\": %d", RSSI);
     strlcat(payload, RSSI_str, sizeof(payload));
@@ -70,18 +79,7 @@ esp_err_t sendMessage(measurement arr[], int length) {
 
     ESP_LOGI("PAYLOAD", "%s", payload);
 
-
-
-    // sync time and check if worked
-    // esp_err_t err = syncTime();
-
-    // if (err != ESP_OK) {
-    //    ESP_LOGE("NTP", "RTC calbration failed in transmit");
-    // }
-    
-    // esp_mqtt_client_config_t mqtt_cfg = {
-    //     .broker.address.uri = BROKER_URI,
-    // };
+    // initialize mqtt client
     esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
 
     // start mqtt client
@@ -90,26 +88,24 @@ esp_err_t sendMessage(measurement arr[], int length) {
     // send data to mqtt
     esp_mqtt_client_publish(client, MQTT_TOPIC, payload, 0, 0, 0);
 
-    // char temperature[16];
-    // snprintf(temperature, sizeof(temperature), "%.2f", arr[0].temp);
-    // esp_mqtt_client_publish(client,"jkonin01/iteration1/ic_temp" , temperature, 0, 0, 0);
-
-
     return ESP_OK;
 }
 
+// function to record wifi connection status in nvs
 int32_t wifiStatus(esp_err_t wifiErr) {
     nvs_handle_t DATA;
     esp_err_t err1;
 
     int32_t wifiFails = 0;
 
+    // open nvs
     err1 = nvs_open("storage", NVS_READWRITE, &DATA);
     if (err1 != ESP_OK) {
         ESP_LOGE("NVS", "couldnt open nvs storage for wifi status");
         return 0; 
     }
 
+    // update wifiFails count
     if (wifiErr == ESP_OK) {
         err1 = nvs_set_i32(DATA, "wifiFails", 0);
         wifiFails = 0;
@@ -119,8 +115,10 @@ int32_t wifiStatus(esp_err_t wifiErr) {
         err1 = nvs_set_i32(DATA, "wifiFails", wifiFails);
     }
 
+    // commit changes
     err1 = nvs_commit(DATA);
 
+    // close nvs
     nvs_close(DATA);
 
     return wifiFails;
