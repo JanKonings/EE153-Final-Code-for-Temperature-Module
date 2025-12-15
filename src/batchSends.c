@@ -113,6 +113,5 @@ void app_main() {
 
   // go to deep sleep for an hour
 
-  // esp_deep_sleep(HOUR_US);
-  esp_deep_sleep(30 * MIN_US); 
+  esp_deep_sleep(HOUR_US);
 }
