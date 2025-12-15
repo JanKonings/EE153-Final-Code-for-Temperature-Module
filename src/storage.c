@@ -108,7 +108,7 @@ void addNewMeasurment(int time, float temp) {
         saveArrayData(); // no read because the array should be empty
         iterationNum = 1;
 
-    } else if (iterationNum >= 11) { // if we have reached batch size of 12 (0-11)
+    } else if (iterationNum >= 23) { // if we have reached batch size of 12 (0-11)
         ESP_LOGI("debug", "INSIDE BATCH SEND");
         readArrayData();
         readings[iterationNum] = newMeasurement;
