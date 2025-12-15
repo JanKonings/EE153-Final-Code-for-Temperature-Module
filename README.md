@@ -3,6 +3,8 @@
 ### Tufts University
 ### School of Engineering | Department of Electrical and Computer Engineering
 
+![FinishedNode](FinishedNode.PNG)
+
 This project implements a low-power, battery-powered temperature sensing node designed for long-term outdoor deployment. The system periodically measures ambient air temperature, timestamps each measurement, stores data locally, and reports measurements in batches to an MQTT server hosted on the Tufts campus network.
 
 The goal of the project was to design a robust sensing node capable of operating for at least six months without mains power while maintaining accurate timekeeping, reliable data storage, and fault-tolerant wireless communication. The embedded firmware was written in C using ESP-IDF.
@@ -51,4 +53,5 @@ Temperature data is transmitted using MQTT over WiFi. Data is sent in batches to
 - Measurements are transmitted in batches of 12 samples twice per day
 - Data is retained locally during network outages
 - The system is designed to operate continuously for six months or longer on battery power
+
 
