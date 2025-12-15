@@ -1,5 +1,5 @@
 # Low-Power Temperature Sensing Node | EE153 | Fall 2025
-### Made by: Jan Konings
+### Made by: Jan Konings, Leah Berube, Paul Hickey
 ### Tufts University
 ### School of Engineering | Department of Electrical and Computer Engineering
 
@@ -51,3 +51,4 @@ Temperature data is transmitted using MQTT over WiFi. Data is sent in batches to
 - Measurements are transmitted in batches of 12 samples twice per day
 - Data is retained locally during network outages
 - The system is designed to operate continuously for six months or longer on battery power
+
