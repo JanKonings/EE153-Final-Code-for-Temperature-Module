@@ -1,5 +1,14 @@
 #include "storage.h"
 
+#include <inttypes.h>
+#include "esp_system.h"
+#include "esp_log.h"
+#include "nvs_flash.h"
+#include "nvs.h"
+#include "transmit.h"
+#include "freertos/FreeRTOS.h"
+
+static const char *TAG = "tempStore";
 // array to hold measurements in memory
 measurement readings[BATCH_NUMBER];
 
@@ -12,14 +21,14 @@ void saveArrayData(void)
     // Open NVS handle
     err = nvs_open(STORAGE_NAMESPACE, NVS_READWRITE, &DATA);
     if (err != ESP_OK) {
-        ESP_LOGE(TAG2, "Error (%s) opening NVS handle!", esp_err_to_name(err));
+        ESP_LOGE(TAG, "Error (%s) opening NVS handle!", esp_err_to_name(err));
         return;
     }
 
     // Write blob
     err = nvs_set_blob(DATA, "measurements", &readings, sizeof(readings));
     if (err != ESP_OK) {
-        ESP_LOGE(TAG2, "Failed to write temperature/time dats array");
+        ESP_LOGE(TAG, "Failed to write temperature/time dats array");
         nvs_close(DATA);
         return;
     }
@@ -27,7 +36,7 @@ void saveArrayData(void)
     // Commit
     err = nvs_commit(DATA);
     if (err != ESP_OK) {
-        ESP_LOGE(TAG2, "Failed to commit data");
+        ESP_LOGE(TAG, "Failed to commit data");
     }
 
     nvs_close(DATA);
@@ -42,20 +51,20 @@ void readArrayData(void)
     // Open NVS handle
     err = nvs_open(STORAGE_NAMESPACE, NVS_READONLY, &DATA);
     if (err != ESP_OK) {
-        ESP_LOGW(TAG2, "readArrayData: nvs_open failed");
+        ESP_LOGW(TAG, "readArrayData: nvs_open failed");
         memset(readings, 0, sizeof(readings));   
         return;
     }
 
     // Read blob
-    ESP_LOGI(TAG2, "Reading temperature/time pair array");
+    ESP_LOGI(TAG, "Reading temperature/time pair array");
     size_t data_size = sizeof(readings);
     err = nvs_get_blob(DATA, "measurements", &readings, &data_size);
     if (err == ESP_ERR_NVS_NOT_FOUND) {
-        ESP_LOGW(TAG2, "readArrayData: no previous measurements, clearing array");
+        ESP_LOGW(TAG, "readArrayData: no previous measurements, clearing array");
         memset(readings, 0, sizeof(readings));
     } else if (err != ESP_OK) {
-        ESP_LOGE(TAG2, "readArrayData: nvs_get_blob failed");
+        ESP_LOGE(TAG, "readArrayData: nvs_get_blob failed");
         memset(readings, 0, sizeof(readings));
     }
 
@@ -75,7 +84,7 @@ void addNewMeasurment(int time, float temp) {
     err = nvs_open(STORAGE_NAMESPACE, NVS_READWRITE, &DATA);
 
     // initializing iterationNum and checking if it already exists in nvs
-    ESP_LOGI(TAG2, "Reading iteration number");
+    ESP_LOGI(TAG, "Reading iteration number");
     int32_t iterationNum = 0;
     err = nvs_get_i32(DATA, "iterationNum", &iterationNum);
 
@@ -85,7 +94,7 @@ void addNewMeasurment(int time, float temp) {
         first_run = true;         
         iterationNum = 0;
     } else if (err != ESP_OK) { // other error
-        ESP_LOGW(TAG2, "nvs_get_i32(iterationNum) failed, resetting to 0");
+        ESP_LOGW(TAG, "nvs_get_i32(iterationNum) failed, resetting to 0");
         iterationNum = 0;
     }
 
@@ -93,7 +102,7 @@ void addNewMeasurment(int time, float temp) {
     if (iterationNum < 0) {
         iterationNum = 0;
     } else if (iterationNum >= BATCH_NUMBER) {
-        ESP_LOGW(TAG2, "iterationNum (%d) >= BATCH_NUMBER (%d), resetting to BATCH_NUMBER - 1", iterationNum, BATCH_NUMBER);
+        ESP_LOGW(TAG, "iterationNum (%d) >= BATCH_NUMBER (%d), resetting to BATCH_NUMBER - 1", iterationNum, BATCH_NUMBER);
         iterationNum = BATCH_NUMBER - 1;
     }
 
@@ -145,18 +154,18 @@ void addNewMeasurment(int time, float temp) {
     }
 
 
-    ESP_LOGI(TAG2, "writing new iteration: %d", iterationNum);
+    ESP_LOGI(TAG, "writing new iteration: %d", iterationNum);
 
     // update iterationNum in nvs
     err = nvs_set_i32(DATA, "iterationNum", iterationNum);
     if (err != ESP_OK) {
-        ESP_LOGE(TAG2, "failed updating interator");
+        ESP_LOGE(TAG, "failed updating interator");
     }
 
     // commit changes
     err = nvs_commit(DATA);
     if (err != ESP_OK) {
-        ESP_LOGE(TAG2, "failed committing iterator");
+        ESP_LOGE(TAG, "failed committing iterator");
     }
 
     // close nvs

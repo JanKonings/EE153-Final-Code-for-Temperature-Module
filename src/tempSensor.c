@@ -1,5 +1,9 @@
-
 #include "tempSensor.h"
+#include "esp_log.h"
+#include "math.h"
+#include "driver/i2c.h"
+
+static const char *TAG = "TEMP";
 
 float tmp1075_read_temp(void) {
   uint8_t reg = TMP1075_TEMP_REG;

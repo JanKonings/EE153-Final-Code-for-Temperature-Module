@@ -1,6 +1,19 @@
 #include "transmit.h"
 #include "RTC.h"
 #include "esp_wifi.h"
+#include <string.h>
+#include "esp_netif.h"
+#include "mqtt_client.h"
+#include "minimal_wifi.h"
+#include <esp_log.h>
+#include "nvs.h"
+#include "simple_RTC.h"
+
+// #define WIFI_SSID      "Verizon_G4PLJC"
+// #define WIFI_PASS      "cue9-pray-awe"
+#define BROKER_URI "mqtt://bell-mqtt.eecs.tufts.edu"
+#define MQTT_TOPIC "teamN/node0/update"
+static const char *TAG = "Transmit";
 
 // static buffer to hold payload
 static char payload[2048];

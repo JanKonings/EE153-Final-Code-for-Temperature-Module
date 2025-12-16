@@ -1,6 +1,19 @@
-#include "RTC.h"
+#include "simple_RTC.h"
+#include <string.h>
+#include <time.h>
+#include <sys/time.h>
+#include "esp_system.h"
+#include "esp_event.h"
+#include "esp_log.h"
+#include "esp_attr.h"
+#include "esp_sleep.h"
+#include "nvs_flash.h"
+#include "esp_netif_sntp.h"
+#include "lwip/ip_addr.h"
+#include "esp_sntp.h"
 
-esp_err_t syncTime() {
+static const char *TAG = "nodeRTC";
+esp_err_t syncTime(void) {
     // default sntp config
     esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG("pool.ntp.org");
     esp_netif_sntp_init(&config);
@@ -17,7 +30,7 @@ esp_err_t syncTime() {
     return ESP_OK;
 }
 
-int getTime() {
+int getTime(void) {
     time_t now;
     time(&now);
 

@@ -3,20 +3,19 @@
 #include "freertos/task.h" 
 #include "soc/gpio_reg.h"
 #include "driver/gpio.h" 
-
 #include "nvs_flash.h"
-
 #include "esp_sleep.h"
-
 #include "esp_timer.h"
-
 #include "tempSensor.h"
-
 #include "storage.h"
+#include "simple_RTC.h"
+#include <sys/time.h>
+#include "transmit.h"
+#include "esp_log.h"
+#include "minimal_wifi.h"
 
-#include "RTC.h"
-
-
+static const char *TAG = "main";
+// This pin powers on the temp sensor
 #define POWER_GPIO GPIO_NUM_0
 
 // useful time defines for deep sleep
@@ -31,18 +30,18 @@ void RTCcheck() {
 
   // if time is not set it will be way below the year 2023
   if (now < 1700000000) {  
-    ESP_LOGW("TIME", "RTC not calibrated, syncing now");
+    ESP_LOGW(TAG, "RTC not calibrated, syncing now");
 
     esp_err_t wifi_err = wifi_connect(WIFI_SSID, WIFI_PASS);
 
     if (syncTime() == ESP_OK) {
-      ESP_LOGI("TIME", "RTC synced successfully");
+      ESP_LOGI(TAG, "RTC synced successfully");
     } else {
-      ESP_LOGE("TIME", "NTP sync failed!");
+      ESP_LOGE(TAG, "NTP sync failed!");
     }
 
   } else {
-    ESP_LOGI("TIME", "RTC already valid");
+    ESP_LOGI(TAG, "RTC already valid");
   }
 }
 
@@ -52,16 +51,16 @@ void sleep_error_check(){
     case ESP_SLEEP_WAKEUP_TIMER:
       break;
     case ESP_SLEEP_WAKEUP_UNDEFINED:
-      ESP_LOGE("SLEEP", "Reset not from sleep");
+      ESP_LOGE(TAG, "Reset not from sleep");
       break;
     case ESP_SLEEP_WAKEUP_VBAT_UNDER_VOLT:
-      ESP_LOGE("SLEEP", "VERY BAD: reset because of low power.");
+      ESP_LOGE(TAG, "VERY BAD: reset because of low power.");
       break;
     case ESP_SLEEP_WAKEUP_COCPU_TRAP_TRIG:
-      ESP_LOGE("SLEEP", "Coprocessor Crash");
+      ESP_LOGE(TAG, "Coprocessor Crash");
       break;
     default:
-      ESP_LOGE("SLEEP", "Wakeup cause weird");
+      ESP_LOGE(TAG, "Wakeup cause weird");
   }
 }
 

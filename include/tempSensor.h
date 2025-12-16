@@ -1,12 +1,6 @@
 #ifndef TEMP_SENSE
 #define TEMP_SENSE
 
-#include "esp_log.h"
-#include "math.h"
-#include "driver/i2c.h"
-
-#define TAG "TEMP"
-
 #define I2C_MASTER_PORT     I2C_NUM_0
 #define I2C_MASTER_FREQ_HZ  100000
 #define SDA_PIN             2

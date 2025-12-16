@@ -1,25 +1,8 @@
 #ifndef TRANSMIT
 #define TRANSMIT
-#include <string.h>
-
-#include "esp_netif.h"
-#include "mqtt_client.h"
-
-#include "minimal_wifi.h"
-
-#include "RTC.h"
-
-#include <esp_log.h>
-
-// #define WIFI_SSID      "Verizon_G4PLJC"
-// #define WIFI_PASS      "cue9-pray-awe"
-
+#include "esp_err.h"
 #define WIFI_SSID      "Tufts_Wireless"
 #define WIFI_PASS      ""
-
-
-#define BROKER_URI "mqtt://bell-mqtt.eecs.tufts.edu"
-#define MQTT_TOPIC "teamN/node0/update"
 
 typedef struct {
     int time; // Unix Time
