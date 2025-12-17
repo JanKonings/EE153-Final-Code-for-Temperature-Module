@@ -53,7 +53,7 @@ esp_err_t sendMessage(measurement arr[], int length) {
 
     // check if already connected (was having issues when RTC would connect and then we would try again here)
     if (wifi_is_connected()) {
-        ESP_LOGI("WIFI", "araready connected, skipping wifif connect");
+        ESP_LOGI(TAG, "araready connected, skipping wifif connect");
         err1 = ESP_OK;   
     } else {
         err1 = wifi_connect(WIFI_SSID, WIFI_PASS);
@@ -69,7 +69,7 @@ esp_err_t sendMessage(measurement arr[], int length) {
 
     // check if wifi connection was successful
     if (err1 != ESP_OK) {
-        ESP_LOGE("WIFI", "failed to connect to wifi");
+        ESP_LOGE(TAG, "failed to connect to wifi");
         return err1;
     }
 
@@ -80,7 +80,7 @@ esp_err_t sendMessage(measurement arr[], int length) {
     if (err == ESP_OK) {
         RSSI = ap_info.rssi;
     } else {
-        ESP_LOGE("WIFI", "failed to egt rssi");
+        ESP_LOGE(TAG, "failed to egt rssi");
     }
 
     // add rssi field to heartbeat
@@ -90,7 +90,7 @@ esp_err_t sendMessage(measurement arr[], int length) {
 
     strlcat(payload, "}}", sizeof(payload));
 
-    ESP_LOGI("PAYLOAD", "%s", payload);
+    ESP_LOGI(TAG, "%s", payload);
 
     // initialize mqtt client
     esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);

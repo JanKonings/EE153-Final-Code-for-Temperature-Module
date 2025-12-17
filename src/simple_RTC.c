@@ -22,11 +22,11 @@ esp_err_t syncTime(void) {
     // currently is waiting for five seconds, but since this is called only once at startup should be fine for power consumptino
     esp_err_t err = esp_netif_sntp_sync_wait(pdMS_TO_TICKS(5000));
     if (err != ESP_OK) {
-        ESP_LOGW("NTP", "did not sync within 5 seconds");
+        ESP_LOGW(TAG, "did not sync within 5 seconds");
         return err;
     }
 
-    ESP_LOGI("NTP", "RTC time calibradte");
+    ESP_LOGI(TAG, "RTC time calibradte");
     return ESP_OK;
 }
 

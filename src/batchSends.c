@@ -34,6 +34,9 @@ void RTCcheck() {
 
     esp_err_t wifi_err = wifi_connect(WIFI_SSID, WIFI_PASS);
 
+    if (wifi_err != ESP_OK){
+      ESP_LOGE(TAG, "WiFi failed to connect");
+    }
     if (syncTime() == ESP_OK) {
       ESP_LOGI(TAG, "RTC synced successfully");
     } else {
